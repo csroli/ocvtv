@@ -39,8 +39,17 @@ int main( int argc, const char** argv ) {
     bool tryflip;
 
     inputName = "";
+		#define VFORMAT 'X', '2', '6', '4'
+		int devnum = 0;
+		bool display = false;
+		if(argc>1){
+			devnum = atoi(argv[1]);
+		}
+		if(argc>2){
+			display = true;
+		}
 
-		if(!capture.open(1))
+		if(!capture.open(devnum))
 				cout << "Could not read " << inputName << endl;
     int64 startTime;
     if( capture.isOpened() )
@@ -49,8 +58,8 @@ int main( int argc, const char** argv ) {
 				VideoWriter outputVideo;
 				Size S = Size((int) capture.get(cv::CAP_PROP_FRAME_WIDTH),    //Acquire input size
 											(int) capture.get(cv::CAP_PROP_FRAME_HEIGHT));
-				outputVideo.open("out.mpg" , VideoWriter::fourcc('X', '2', '6', '5'), capture.get(cv::CAP_PROP_FPS),S, true);
-
+				//outputVideo.open("out.avi" , VideoWriter::fourcc(VFORMAT), capture.get(cv::CAP_PROP_FPS),S, true);
+//
         tbb::concurrent_bounded_queue<ProcessingChainData *> guiQueue;
         guiQueue.set_capacity(3); // TBB NOTE: flow control so the pipeline won't fill too much RAM
         auto pipelineRunner = thread( tbbqueue, ref(capture), ref(guiQueue));
@@ -74,13 +83,14 @@ int main( int argc, const char** argv ) {
                 imshow( "result", dst );*/
 								if(pData->moved || !started){
 									if(!outputVideo.isOpened()){
-										outputVideo.open("out.mpg" , VideoWriter::fourcc('X', '2', '6', '5'), capture.get(cv::CAP_PROP_FPS),S, true);
+										outputVideo.open("out.avi" , VideoWriter::fourcc(VFORMAT), capture.get(cv::CAP_PROP_FPS),S, true);
 									}
-									//imshow( "result", pData->img );
+									if(display)
+										imshow( "result", pData->img );
 									outputVideo<<pData->img;
 									started = true;
 								}else if(outputVideo.isOpened()){
-									outputVideo.release();
+									//outputVideo.release();
 								}
 								
                 delete pData;

@@ -32,4 +32,8 @@
 *.app
 
 VidCap
-out.mpg
+*.mpg
+*.avi
+
+# vim
+*.swp
